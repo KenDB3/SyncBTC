@@ -3,8 +3,10 @@ load("sbbsdefs.js"); //loads a bunch-o-stuff that is probably beyond the underst
 
 function bitcoinprice() {
 		var totalHeight = console.screen_rows;
-		var appHeight = (console.screen_rows - 7); //minus 3 top, minus 3 bottom
+		var appHeight = (console.screen_rows - 6); //minus 3 top, minus 3 bottom
 		var yAxisHeight = (appHeight - 2); //minus 2 more for max/min data points
+		var appLength = (console.screen_columns - 1);
+		var xAxisLength = (console.screen_columns - 4); //minus 3 for numbers on left, minus 1 for border on right 
 		var gray = "\1n\001w"; //Synchronet Ctrl-A Code for Normal White (which looks gray)
 		var white = "\001w\1h"; //Synchronet Ctrl-A Code for High Intensity White
 		var darkyellow = "\001n\001y"; //Synchronet Ctrl-A Code for Dark (normal) Yellow
@@ -30,11 +32,10 @@ function bitcoinprice() {
 			
 		var btcxAxis = " \263";
         var reqExchangeRate = new HTTPRequest();
-        var reqSpotPrice = new HTTPRequest();
 		var reqHistoricPriceDays = new HTTPRequest();
 
 		var exchangeRate = reqExchangeRate.Get("https://api.coinbase.com/v2/exchange-rates?currency=BTC");
-		var historicPriceDays = reqHistoricPriceDays.Get("https://api.coinbase.com/v2/prices/historic?currency=USD&days=76");
+		var historicPriceDays = reqHistoricPriceDays.Get("https://api.coinbase.com/v2/prices/historic?currency=USD&days=" + xAxisLength);
 		// Make sure we actually got a response. If not, log an error and exit.
 		if (exchangeRate === undefined || historicPriceDays === undefined) {
 			log("ERROR in coinbase.js: Request to api.coinbase.com returned 'undefined'");
@@ -46,15 +47,33 @@ function bitcoinprice() {
 		// Parse the JSON responses.
 		var jsonExchangeRate = JSON.parse(exchangeRate);
 		var jsonHistoricPriceDays = JSON.parse(historicPriceDays);
+		// (Obviously stolen from syncWXremix... this sits here a while) Check if the JSON is properly formatted. The "data" should wrap the entire object.
 		/* make some error checking at some point
+		if (jsonExchangeRate.hasOwnProperty("data") ) {
+			// Check if the response contains an error message. If so, log the error and exit.
+			if (cu["response"].hasOwnProperty("error")) {
+				var errtype = cu["response"]["error"]["type"];
+				var errdesc = cu["response"]["error"]["description"];
+				log("ERROR in weather.js: api.wunderground.com returned a '" + errtype + "' error with this description: '" + errdesc + "'.");
+				log(LOG_DEBUG,"DEBUG for weather.js. API call looked like this at time of error: " + "http://api.wunderground.com/api/" + wungrndAPIkey + "/conditions/forecast/astronomy/alerts/" + WXlang + "q/" + wungrndQuery);
+				log(LOG_DEBUG,"DEBUG for weather.js. The user.connection object looked like this at the time of error: " + user.connection);
+				log(LOG_DEBUG,"DEBUG for weather.js. The dialup variable looked like this at the time of error: " + dialup);
+				log(LOG_DEBUG,"DEBUG for weather.js. The language defined in /ctrl/modopts.ini is: " + opts.language);
+				console.center("There was a problem getting data from Weather Underground.");
+				console.center("The sysop has been notified.");
+				console.pause();
+				exit();
+			}
+		}
 		*/
 		var rateUSD = jsonExchangeRate.data.rates.USD;
 		var rateGBP = jsonExchangeRate.data.rates.GBP;
 		var rateEUR = jsonExchangeRate.data.rates.EUR;
+		var l = jsonHistoricPriceDays.data.prices.length;
 		
 		var Intermezzo = [];
 		var j = 0;
-		while (j < 76) {
+		while (j < l) {
 			var addit = jsonHistoricPriceDays.data.prices[j].price;
 			Intermezzo.push(addit);
 			j++;
@@ -66,7 +85,6 @@ function bitcoinprice() {
 		var btcMin = Math.min.apply(null, Intermezzo);
 		var btcMinWhole = Math.round(btcMin);
 		var ratio = ((btcMaxWhole - btcMinWhole) / (appHeight - 1));
-		var l = jsonHistoricPriceDays.data.prices.length;
 		var i = 0;
 		while (i < l) {
 			var normalizeData = (Intermezzo[i]/ratio) - appHeight;
@@ -112,12 +130,12 @@ function bitcoinprice() {
 			write(btcxAxis);
 			k++;
 		}
-		console.gotoxy(1,(totalHeight - 4));
-		console.putmsg(darkmagenta + btcMinWhole);
 		console.gotoxy(1,(totalHeight - 3));
+		console.putmsg(darkmagenta + btcMinWhole);
+		console.gotoxy(1,(totalHeight - 2));
 		console.putmsg(btcFooter);
 		console.crlf();
-		console.gotoxy(26,2);
+		console.gotoxy(26,1);
 		//Draw current Exchange Rate at the top in USD, EUR, and GBP
 		console.putmsg(darkcyan + "\044" + rateUSD + " USD/BTC" + " - \356" + rateEUR + " EUR/BTC" + " - \234" + rateGBP + " GPB/BTC");
 		
@@ -126,9 +144,9 @@ function bitcoinprice() {
 		//start plotting X from the right, because most recent data is at the front of the JSON DB data
 		//Y-axis (after the flip) needs a +5 to get above the footer area
 		var plot = 0;
-		while (plot < 76) {
+		while (plot < xAxisLength) {
 			var flip = appHeight - btcArray[plot];
-			console.gotoxy((79 - plot),flip + 5);
+			console.gotoxy((appLength - plot),flip + 5);
 			if ((flip / yAxisHeight) <= ((1/12) * 1)) {
 				write(darkblue);
 			} else if ((flip / yAxisHeight) <= ((1/12) * 2)) {
