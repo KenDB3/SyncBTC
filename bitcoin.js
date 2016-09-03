@@ -3,8 +3,6 @@
 load("http.js"); //this loads the http libraries which you will need to make requests to the web server
 load("sbbsdefs.js"); //loads a bunch-o-stuff that is probably beyond the understanding of mere mortals 
 load(js.exec_dir + "ctrl-a_colors.js"); //predefined a whole bunch of Ctrl-A (Sync) Color Codes
-load("event-timer.js");
-
 var opts=load({},"modopts.js","SyncBTC"); 
 
 if (typeof opts.chartCurrency === 'undefined') {
@@ -36,33 +34,15 @@ if (chartCurrency == "USD" || chartCurrency == "XCD" || chartCurrency == "AUD" |
 } else {
 	var currSymbol = "";
 }
-
-var totalHeight = console.screen_rows;
-var appHeight = (console.screen_rows - 6); //minus 3 top, minus 3 bottom
-var yAxisHeight = (appHeight - 2); //minus 2 more for max/min data points
-var totalLength = console.screen_columns;
-var appLength = (console.screen_columns - 1);
-var xAxisLength = (console.screen_columns - 4); //minus 3 for numbers on left, minus 1 for border on right 
-
-var timer=new Timer();
-
-function bitbomb() {
-	for (j = 1; j < (totalHeight - 2); j++) {
-		for (i = 0; i < totalLength; i++) {
-			console.gotoxy((totalLength - i),(totalHeight - j));
-			if (Math.random() > 0.50) {
-				console.putmsg(blue + "1");
-			} else {
-				console.putmsg(darkblue + "0");
-			}
-		}
-	}
-}
-
-var event1 = timer.addEvent(600,4,bitbomb);
-
 	
 function bitcoinprice() {
+		var totalHeight = console.screen_rows;
+		var appHeight = (console.screen_rows - 6); //minus 3 top, minus 3 bottom
+		var yAxisHeight = (appHeight - 2); //minus 2 more for max/min data points
+		var totalLength = console.screen_columns;
+		var appLength = (console.screen_columns - 1);
+		var xAxisLength = (console.screen_columns - 4); //minus 3 for numbers on left, minus 1 for border on right 
+		
 		if (totalHeight < 11) {
 			console.clear();
 			write(magenta + "\r\nYour terminal height is too few rows for this app to run. \r\nReturning you to the BBS...");
@@ -89,10 +69,17 @@ function bitcoinprice() {
         var reqExchangeRate = new HTTPRequest();
 		var reqHistoricPriceDays = new HTTPRequest();
 		
-		while(timer.events.length > 0) {
-			timer.cycle();
-			mswait(100);
-			//event1.abort = true;
+		for (k = 0; k < 4; k++) {
+			for (j = 1; j < (totalHeight - 2); j++) {
+				for (i = 0; i < totalLength; i++) {
+					console.gotoxy((totalLength - i),(totalHeight - j));
+					if (Math.random() > 0.50) {
+						console.putmsg(blue + "1");
+					} else {
+						console.putmsg(darkblue + "0");
+					}
+				}
+			}
 		}
 		
 		var bitgraphx = 0;
