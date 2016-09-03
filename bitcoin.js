@@ -69,17 +69,45 @@ function bitcoinprice() {
         var reqExchangeRate = new HTTPRequest();
 		var reqHistoricPriceDays = new HTTPRequest();
 		
+		function stallwithmath() {
+			var stall = Math.sqrt((100 * Math.random()) * Math.PI * Math.log(Math.E));
+			stall = stall * (Math.LOG2E * Math.LOG10E);
+			 var a=stall * 3;
+			 var b=stall * 4;
+			 var c=stall * 5;
+			 var a2=2*a;
+			 var ac=4*a*c;
+			 var dis=b*b;
+			 var dis=dis-ac;
+			 if(dis<0){
+				var donestalling = 0;
+				}
+			 else{
+				var dis_sqrt=Math.sqrt(dis);
+				var x1=-b+dis_sqrt;
+				var x1=x1/a2;
+				var x2=-b-dis_sqrt;
+				var x2=x2/a2;
+				var donestalling = 1;
+				}
+		}
+		
 		for (k = 0; k < 4; k++) {
 			for (j = 1; j < (totalHeight - 2); j++) {
 				for (i = 0; i < totalLength; i++) {
 					console.gotoxy((totalLength - i),(totalHeight - j));
 					if (Math.random() > 0.50) {
 						console.putmsg(blue + "1");
+						stallwithmath()
 					} else {
 						console.putmsg(darkblue + "0");
+						stallwithmath()
 					}
+					stallwithmath()
 				}
+				stallwithmath()
 			}
+			stallwithmath()
 		}
 		
 		var bitgraphx = 0;
@@ -87,35 +115,51 @@ function bitcoinprice() {
 		while ((bitgraphx + 9) < totalLength) {
 			console.gotoxy(4 + bitgraphx,3);
 			console.putmsg(darkcyan + "B");
+			stallwithmath()
 			console.gotoxy(6 + bitgraphx,3);
 			console.putmsg(darkcyan + "B");
+			stallwithmath()
 			console.gotoxy(2 + bitgraphx,4);
 			console.putmsg(darkcyan + "BBBBBBB");
+			stallwithmath()
 			console.gotoxy(2 + bitgraphx,5);
 			console.putmsg(darkcyan + "BB");
+			stallwithmath()
 			console.gotoxy(8 + bitgraphx,5);
 			console.putmsg(darkcyan + "BB");
+			stallwithmath()
 			console.gotoxy(2 + bitgraphx,6);
 			console.putmsg(darkcyan + "BB");
+			stallwithmath()
 			console.gotoxy(8 + bitgraphx,6);
 			console.putmsg(darkcyan + "BB");
+			stallwithmath()
 			console.gotoxy(2 + bitgraphx,7);
 			console.putmsg(darkcyan + "BBBBBBB");
+			stallwithmath()
 			console.gotoxy(2 + bitgraphx,8);
 			console.putmsg(darkcyan + "BB");
+			stallwithmath()
 			console.gotoxy(8 + bitgraphx,8);
 			console.putmsg(darkcyan + "BB");
+			stallwithmath()
 			console.gotoxy(2 + bitgraphx,9);
 			console.putmsg(darkcyan + "BB");
+			stallwithmath()
 			console.gotoxy(8 + bitgraphx,9);
 			console.putmsg(darkcyan + "BB");
+			stallwithmath()
 			console.gotoxy(2 + bitgraphx,10);
 			console.putmsg(darkcyan + "BBBBBBB");
+			stallwithmath()
 			console.gotoxy(4 + bitgraphx,11);
 			console.putmsg(darkcyan + "B");
+			stallwithmath()
 			console.gotoxy(6 + bitgraphx,11);
 			console.putmsg(darkcyan + "B");
+			stallwithmath()
 			bitgraphx = bitgraphx + 9;
+			stallwithmath()
 		}
 		
 
@@ -133,24 +177,33 @@ function bitcoinprice() {
 		var jsonExchangeRate = JSON.parse(exchangeRate);
 		var jsonHistoricPriceDays = JSON.parse(historicPriceDays);
 		// Check if the JSON is properly formatted. The "data" should wrap the entire object.
-		/* make some error checking at some point
 		if (jsonExchangeRate.hasOwnProperty("data") ) {
 			// Check if the response contains an error message. If so, log the error and exit.
-			if (cu["response"].hasOwnProperty("error")) {
-				var errtype = cu["response"]["error"]["type"];
-				var errdesc = cu["response"]["error"]["description"];
-				log("ERROR in weather.js: api.wunderground.com returned a '" + errtype + "' error with this description: '" + errdesc + "'.");
-				log(LOG_DEBUG,"DEBUG for weather.js. API call looked like this at time of error: " + "http://api.wunderground.com/api/" + wungrndAPIkey + "/conditions/forecast/astronomy/alerts/" + WXlang + "q/" + wungrndQuery);
-				log(LOG_DEBUG,"DEBUG for weather.js. The user.connection object looked like this at the time of error: " + user.connection);
-				log(LOG_DEBUG,"DEBUG for weather.js. The dialup variable looked like this at the time of error: " + dialup);
-				log(LOG_DEBUG,"DEBUG for weather.js. The language defined in /ctrl/modopts.ini is: " + opts.language);
-				console.center("There was a problem getting data from Weather Underground.");
+			if (jsonExchangeRate.hasOwnProperty("errors") || jsonHistoricPriceDays.hasOwnProperty("errors")) {
+				if (jsonExchangeRate.hasOwnProperty("errors")) {
+					var exchange_errtype = jsonExchangeRate["errors"]["id"];
+					var exchange_errdesc = jsonExchangeRate["errors"]["message"];
+				}
+				if (jsonHistoricPriceDays.hasOwnProperty("errors")) {
+					var history_errtype = jsonHistoricPriceDays["errors"]["id"];
+					var history_errdesc = jsonHistoricPriceDays["errors"]["message"];
+				}
+				if (jsonExchangeRate.hasOwnProperty("errors")) {
+					log("ERROR in bitcoin.js for Exchange Rate Lookup: api.coinbase.com returned a '" + exchange_errtype + "' error with this description: '" + exchange_errdesc + "'.");
+					log(LOG_DEBUG,"DEBUG for bitcoin.js. API call looked like this at time of error: " + "https://api.coinbase.com/v2/exchange-rates?currency=BTC");
+				}
+				if (jsonHistoricPriceDays.hasOwnProperty("errors")) {
+					log("ERROR in bitcoin.js for Historic Price Lookup: api.coinbase.com returned a '" + history_errtype + "' error with this description: '" + history_errdesc + "'.");
+					log(LOG_DEBUG,"DEBUG for bitcoin.js. API call looked like this at time of error: " + "https://api.coinbase.com/v2/prices/historic?currency="+ chartCurrency + "&days=" + xAxisLength);
+				}
+				log(LOG_DEBUG,"DEBUG for bitcoin.js. The currency defined in /ctrl/modopts.ini is: " + opts.chartCurrency);
+				log(LOG_DEBUG,"DEBUG for bitcoin.js. The calculated currency after reading /ctrl/modopts.ini is: " + chartCurrency);
+				console.center("There was a problem getting data from Coinbase.com.");
 				console.center("The sysop has been notified.");
 				console.pause();
 				exit();
 			}
 		}
-		*/
 		var rateUSD = jsonExchangeRate.data.rates.USD; //US Dollar
 		var rateCAD = jsonExchangeRate.data.rates.CAD; //Canadian Dollar
 		var rateGBP = jsonExchangeRate.data.rates.GBP; //Great Britain Pound
