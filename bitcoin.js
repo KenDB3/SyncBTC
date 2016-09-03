@@ -120,36 +120,51 @@ function bitcoinprice() {
 		console.putmsg(darkblue + btcMaxWhole);
 		//Draw a color coded y-axis
 		var k = 0;
+		var colorArray = [];
+		colorArray.push(darkblue);
 		while (k < (yAxisHeight + 1)) {
 			console.gotoxy(1,(k + 5));
 			if ((k / yAxisHeight) <= ((1/12) * 1)) {
 				write(darkblue);
+				colorArray.push(darkblue);
 			} else if ((k / yAxisHeight) <= ((1/12) * 2)) {
 				write(blue);
+				colorArray.push(blue);
 			} else if ((k / yAxisHeight) <= ((1/12) * 3)) {
 				write(darkcyan);
+				colorArray.push(darkcyan);
 			} else if ((k / yAxisHeight) <= ((1/12) * 4)) {
 				write(cyan);
+				colorArray.push(cyan);
 			} else if ((k / yAxisHeight) <= ((1/12) * 5)) {
 				write(darkgreen);
+				colorArray.push(darkgreen);
 			} else if ((k / yAxisHeight) <= ((1/12) * 6)) {
 				write(green);
+				colorArray.push(green);
 			} else if ((k / yAxisHeight) <= ((1/12) * 7)) {
 				write(yellow);
+				colorArray.push(yellow);
 			} else if ((k / yAxisHeight) <= ((1/12) * 8)) {
 				write(darkyellow);
+				colorArray.push(darkyellow);
 			} else if ((k / yAxisHeight) <= ((1/12) * 9)) {
 				write(red);
+				colorArray.push(red);
 			} else if ((k / yAxisHeight) <= ((1/12) * 10)) {
 				write(darkred);
+				colorArray.push(darkred);
 			} else if ((k / yAxisHeight) <= ((1/12) * 11)) {
 				write(magenta);
+				colorArray.push(magenta);
 			} else {
 				write(darkmagenta);
+				colorArray.push(darkmagenta);
 			}
 			write(btcxAxis);
 			k++;
 		}
+		colorArray.push(darkmagenta);
 		console.gotoxy(1,(totalHeight - 3));
 		//Write the Min value of the y-axis
 		console.putmsg(darkmagenta + btcMinWhole);
@@ -209,42 +224,12 @@ function bitcoinprice() {
 		while (plot < xAxisLength) {
 			var flip = totalHeight - btcArray[plot];
 			console.gotoxy((appLength - plot),(flip - normYAxis));
-			if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/14) * 1)) {
-				write(darkblue);
-			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 1)) {
-				write(darkblue);
-			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 2)) {
-				write(blue);
-			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 3)) {
-				write(darkcyan);
-			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 4)) {
-				write(cyan);
-			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 5)) {
-				write(darkgreen);
-			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 6)) {
-				write(green);
-			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 7)) {
-				write(yellow);
-			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 8)) {
-				write(darkyellow);
-			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 9)) {
-				write(red);
-			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 10)) {
-				write(darkred);
-			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 11)) {
-				write(magenta);
-			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 12)) {
-				write(darkmagenta);
-			} else {
-				write(darkmagenta);
-			}
+			var colorcode = (appHeight - (btcArray[plot] - normBtcMin + 1));
+			
+			write(colorArray[colorcode]);
 			write("\052");
 			plot++;
 		}
-		console.gotoxy(5,5);
-		write(normBtcMax);
-		console.gotoxy(5,6);
-		write(normBtcMin);
 		console.gotoxy(1,(totalHeight - 1));
 }
 
