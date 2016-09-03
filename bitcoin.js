@@ -580,30 +580,15 @@ function bitcoinprice() {
 	//longer terminal screens (aka more columns) get more rates at the top
 	switch(localizeCurrency) {
 		case 1: //local is USD
-			if (appLength > (46 + rateUSD.length + rateCAD.length)) {
-				moreExchRates.push(darkcyan + " - \044" + rateCAD + " CAD/BTC");
-			}
-			if (appLength > (58 + rateUSD.length + rateCAD.length + rateEUR.length)) {
-				moreExchRates.push(darkcyan + " - \356" + rateEUR + " EUR/BTC");
-			}
-			if (appLength > (70 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length)) {
-				moreExchRates.push(darkcyan + " - \234" + rateGBP + " GBP/BTC");
-			}
-			if (appLength > (82 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length)) {
-				moreExchRates.push(darkcyan + " - \235" + rateJPY + " JPY/BTC");
-			}
-			if (appLength > (94 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length)) {
-				moreExchRates.push(darkcyan + " - \235" + rateCNY + " CNY/BTC");
-			}
-			if (appLength > (106 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length)) {
-				moreExchRates.push(darkcyan + " - \044" + rateAUD + " AUD/BTC");
-			}
-			if (appLength > (118 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length)) {
-				moreExchRates.push(darkcyan + " - \044" + rateNZD + " NZD/BTC");
-			}
-			if (appLength > (130 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length + rateCHF.length )) {
-				moreExchRates.push(darkcyan + " - " + redbackground + white + "\053" + darkcyan + rateCHF + " CHF/BTC");
-			}
+			moreExchRates.push(darkcyan + " - \044" + rateCAD + " CAD/BTC");
+			moreExchRates.push(darkcyan + " - \356" + rateEUR + " EUR/BTC");
+			moreExchRates.push(darkcyan + " - \234" + rateGBP + " GBP/BTC");
+			moreExchRates.push(darkcyan + " - \235" + rateJPY + " JPY/BTC");
+			moreExchRates.push(darkcyan + " - \235" + rateCNY + " CNY/BTC");
+			moreExchRates.push(darkcyan + " - \044" + rateAUD + " AUD/BTC");
+			moreExchRates.push(darkcyan + " - \044" + rateNZD + " NZD/BTC");
+			moreExchRates.push(darkcyan + " - \053" + rateCHF + " CHF/BTC");
+			var pahkthecah = rateUSD.length;
 			break;
 		case 2: //local is CAD
 			if (appLength > (46 + rateCAD.length + rateUSD.length)) {
@@ -844,7 +829,20 @@ function bitcoinprice() {
 	} 
 	
 	//write a shuffled version of the array we built... I hope.
-	console.putmsg(shuffleArray(moreExchRates));
+	var crazy = shuffleArray(moreExchRates);
+	var fuckincrazy = "";
+	for (ar = 0; ar < (crazy.length); ar++) {
+		if (appLength > (30 + pahkthecah + crazy[ar].length)) {  //34 preceding characters without the length of the sysop chosen rate. That's added by pahkthecah. Then subtract the 4 control characters: SOH, n, SOH, c.
+			fuckincrazy = fuckincrazy + crazy[ar];
+			pahkthecah = (pahkthecah + crazy[ar].length - 4);    //Add the length of the additional string characters to pahkthecah, but subtract the 4 control characters: SOH, n, SOH, c
+		} else {
+			break;
+		}
+	}
+	
+	fuckincrazy = fuckincrazy.replace(/[\053]/g, redbackground + white + "\053" + darkcyan); 
+	
+	console.putmsg(fuckincrazy);
 	
 			
 	//Now to plot the normalized data
