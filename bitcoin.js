@@ -1,6 +1,40 @@
+//Thanks to http://www.xe.com/symbols.php for help with some of the currency symbols
+
 load("http.js"); //this loads the http libraries which you will need to make requests to the web server
 load("sbbsdefs.js"); //loads a bunch-o-stuff that is probably beyond the understanding of mere mortals 
+load(js.exec_dir + "ctrl-a_colors.js"); //predefined a whole bunch of Ctrl-A (Sync) Color Codes
+var opts=load({},"modopts.js","SyncBTC"); 
 
+if (typeof opts.chartCurrency === 'undefined') {
+	var chartCurrency = 'USD'; //Default to USD if this field is left blank or does not exist in modopts.ini
+} else {
+	var chartCurrency = opts.chartCurrency.toUpperCase(); //otherwise, load the chosen currency
+}
+
+if (chartCurrency == "USD" || chartCurrency == "XCD" || chartCurrency == "AUD" || chartCurrency == "BSD" || chartCurrency == "BBD" || chartCurrency == "BZD" || chartCurrency == "BMD" || chartCurrency == "BND" || chartCurrency == "CAD" || chartCurrency == "KYD" || chartCurrency == "GYD" || chartCurrency == "HKD" || chartCurrency == "JMD" || chartCurrency == "LRD" || chartCurrency == "NAD" || chartCurrency == "NZD" || chartCurrency == "SGD" || chartCurrency == "SBD" || chartCurrency == "SRD" || chartCurrency == "TWD" || chartCurrency == "TTD" || chartCurrency == "BOB" || chartCurrency == "BRL" || chartCurrency == "CVE" || chartCurrency == "CLP" || chartCurrency == "COP" || chartCurrency == "DOP" || chartCurrency == "SVC" || chartCurrency == "FJD" || chartCurrency == "MXN" || chartCurrency == "NIO" || chartCurrency == "TVD" || chartCurrency == "UYU" || chartCurrency == "ZWD") {
+	var currSymbol = "\044"; //CP437 dollar sign $
+} else if (chartCurrency == "EUR") {
+	var currSymbol = "\356"; //CP437 uppercase Epsilon to symbolize the Euro
+} else if (chartCurrency == "CRC" || chartCurrency == "GHS" || chartCurrency == "") {
+	var currSymbol = "\233"; //CP437 cent symbol
+} else if (chartCurrency == "GBP" || chartCurrency == "EGP" || chartCurrency == "FKP" || chartCurrency == "GIP" || chartCurrency == "GGP" || chartCurrency == "IMP" || chartCurrency == "JEP" || chartCurrency == "LBP" || chartCurrency == "SHP" || chartCurrency == "SYP") {
+	var currSymbol = "\234"; //CP437 pound symbol
+} else if (chartCurrency == "JPY" || chartCurrency == "CNY") {
+	var currSymbol = "\235"; //CP437 yen or yuan symbol
+} else if (chartCurrency == "AWG" || chartCurrency == "ANG") {
+	var currSymbol = "\237"; //CP437 the florin sign
+} else if (chartCurrency == "GTQ") {
+	var currSymbol = "Q"; //CP437 capital Q to symbolize Guatemala Quetzal
+} else if (chartCurrency == "HNL") {
+	var currSymbol = "L"; //CP437 capital L to symbolize Honduras Lempira
+} else if (chartCurrency == "SOS") {
+	var currSymbol = "S"; //CP437 capital S to symbolize Somalia Shilling
+} else if (chartCurrency == "ZAR") {
+	var currSymbol = "R"; //CP437 capital R to symbolize South Africa Rand
+} else {
+	var currSymbol = "";
+}
+	
 function bitcoinprice() {
 		var totalHeight = console.screen_rows;
 		var appHeight = (console.screen_rows - 6); //minus 3 top, minus 3 bottom
@@ -8,26 +42,25 @@ function bitcoinprice() {
 		var totalLength = console.screen_columns;
 		var appLength = (console.screen_columns - 1);
 		var xAxisLength = (console.screen_columns - 4); //minus 3 for numbers on left, minus 1 for border on right 
-		var gray = "\1n\001w"; //Synchronet Ctrl-A Code for Normal White (which looks gray)
-		var white = "\001w\1h"; //Synchronet Ctrl-A Code for High Intensity White
-		var darkyellow = "\001n\001y"; //Synchronet Ctrl-A Code for Dark (normal) Yellow
-		var yellow = "\001y\1h"; //Synchronet Ctrl-A Code for High Intensity Yellow
-		var darkblue = "\001n\001b"; //Synchronet Ctrl-A Code for Dark (normal) Blue
-		var blue = "\001b\1h"; //Synchronet Ctrl-A Code for High Intensity Blue
-		var darkred = "\001n\001r"; //Synchronet Ctrl-A Code for Dark (normal) Red
-		var red = "\001r\1h"; //Synchronet Ctrl-A Code for High Intensity Red
-		var darkcyan = "\001n\001c"; //Synchronet Ctrl-A Code for Dark (normal) Cyan
-		var cyan = "\001c\1h"; //Synchronet Ctrl-A Code for High Intensity Cyan
-		var darkgreen = "\001n\001g"; //Synchronet Ctrl-A Code for Dark (normal) Green
-		var green = "\001g\1h"; //Synchronet Ctrl-A Code for High Intensity Green
-		var darkmagenta = "\001n\001m"; //Synchronet Ctrl-A Code for Dark (normal) Magenta
-		var magenta = "\001m\1h"; //Synchronet Ctrl-A Code for High Intensity Magenta
-		var black = "\001n\001k"; //Synchronet Ctrl-A Code for Dark (normal) Black
-		var darkgray = "\001k\1h"; //Synchronet Ctrl-A Code for High Intensity Black which looks Dark Gray
+		
+		if (totalHeight < 11) {
+			console.clear();
+			write(magenta + "\r\nYour terminal height is too few rows for this app to run. \r\nReturning you to the BBS...");
+			console.aborted = false;
+			exit();
+		}
+		
+		if (totalLength < 80) {
+			console.clear();
+			write(magenta + "\r\nYour terminal length is too few columns for this app to run. \r\nReturning you to the BBS...");
+			console.aborted = false;
+			exit();
+		}
+		
 		console.clear();
 		write(magenta + "\r\nPolling Live and Historical Bitcoin Prices... Please be patient.");
 		var btcHeader = blue + "\r\n  Current Exchange Rate: \r\n" + 
-			darkblue + " \325\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315 " + blue + "Bitcoin Price Chart (USD)" + darkblue + " \315\315";
+			darkblue + " \325\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315 " + blue + "Bitcoin Price Chart (" + chartCurrency + ")" + darkblue + " \315\315";
 		var btcFooter = darkmagenta + " \324\315oldest\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\r\n" 
 			+ darkmagenta + "  syncBTC:" + blue + "KenDB3  " + darkmagenta + "Data:" + blue + "Coinbase.com  " + darkmagenta + "Original Concept:" + blue + "BCR / BitSunrise.com " + darkmagenta + "\315\315\315\r\n";
 		var btcFooterEnd1 = "\270";
@@ -37,7 +70,7 @@ function bitcoinprice() {
 		var reqHistoricPriceDays = new HTTPRequest();
 
 		var exchangeRate = reqExchangeRate.Get("https://api.coinbase.com/v2/exchange-rates?currency=BTC");
-		var historicPriceDays = reqHistoricPriceDays.Get("https://api.coinbase.com/v2/prices/historic?currency=USD&days=" + xAxisLength);
+		var historicPriceDays = reqHistoricPriceDays.Get("https://api.coinbase.com/v2/prices/historic?currency="+ chartCurrency + "&days=" + xAxisLength);
 		// Make sure we actually got a response. If not, log an error and exit.
 		if (exchangeRate === undefined || historicPriceDays === undefined) {
 			log("ERROR in coinbase.js: Request to api.coinbase.com returned 'undefined'");
@@ -68,12 +101,15 @@ function bitcoinprice() {
 			}
 		}
 		*/
-		var rateUSD = jsonExchangeRate.data.rates.USD;
-		var rateCAD = jsonExchangeRate.data.rates.CAD;
-		var rateGBP = jsonExchangeRate.data.rates.GBP;
-		var rateEUR = jsonExchangeRate.data.rates.EUR;
-		var rateJPY = jsonExchangeRate.data.rates.JPY;
-		var rateCNY = jsonExchangeRate.data.rates.CNY;
+		var rateUSD = jsonExchangeRate.data.rates.USD; //US Dollar
+		var rateCAD = jsonExchangeRate.data.rates.CAD; //Canadian Dollar
+		var rateGBP = jsonExchangeRate.data.rates.GBP; //Great Britain Pound
+		var rateEUR = jsonExchangeRate.data.rates.EUR; //Euro
+		var rateJPY = jsonExchangeRate.data.rates.JPY; //Japanese Yen
+		var rateCNY = jsonExchangeRate.data.rates.CNY; //Chinese Yuan
+		var rateCHF = jsonExchangeRate.data.rates.CHF; //Swiss Franc
+		var rateAUD = jsonExchangeRate.data.rates.AUD; //Australian Dollar
+		var rateNZD = jsonExchangeRate.data.rates.NZD; //New Zealand Dollar
 		var l = jsonHistoricPriceDays.data.prices.length; //That's a lowercase letter "L", as in length
 		
 		//This got messy and difficult, so creating an intermediate array to hold the data made things easier
@@ -90,8 +126,8 @@ function bitcoinprice() {
 		var btcArray = [];
 		var btcMax = Math.max.apply(null, Intermezzo);
 		var btcMaxWhole = Math.round(btcMax);
-		if (btcMaxWhole.length > 3) {
-			xAxisLength = (xAxisLength - (btcMaxWhole.length - 3));
+		if (btcMaxWhole.toString().length > 3) {
+			xAxisLength = (xAxisLength - (btcMaxWhole.toString().length - 3));
 		}
 		var btcMin = Math.min.apply(null, Intermezzo);
 		var btcMinWhole = Math.round(btcMin);
@@ -219,21 +255,35 @@ function bitcoinprice() {
 		console.crlf();
 		console.gotoxy(26,1);
 		//Draw current Exchange Rate at the top in USD, EUR, and GBP
-		console.putmsg(darkcyan + "\044" + rateUSD + " USD/BTC" + " - \044" + rateCAD + " CAD/BTC" + " - \356" + rateEUR + " EUR/BTC");
-		if (appLength > 98) {
+		console.putmsg(darkcyan + "\044" + rateUSD + " USD/BTC" + " - \044" + rateCAD + " CAD/BTC");
+		
+		
+		if (appLength > (59 + rateUSD.length + rateCAD.length + rateEUR.length)) {
+			console.putmsg(darkcyan + " - \356" + rateEUR + " EUR/BTC");
+		}
+		if (appLength > (70 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length)) {
 			console.putmsg(darkcyan + " - \234" + rateGBP + " GBP/BTC");
 		}
-		if (appLength > 118) {
+		if (appLength > (82 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length)) {
 			console.putmsg(darkcyan + " - \235" + rateJPY + " JPY/BTC");
 		}
-		if (appLength > 133) {
+		if (appLength > (94 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length)) {
 			console.putmsg(darkcyan + " - \235" + rateCNY + " CNY/BTC");
+		}
+		if (appLength > (108 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateCHF.length)) {
+			console.putmsg(darkcyan + " - SFr" + rateCHF + " CHF/BTC");
+		}
+		if (appLength > (120 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateCHF.length + rateAUD.length)) {
+			console.putmsg(darkcyan + " - \044" + rateAUD + " AUD/BTC");
+		}
+		if (appLength > (132 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateCHF.length + rateAUD.length + rateNZD.length)) {
+			console.putmsg(darkcyan + " - \044" + rateNZD + " NZD/BTC");
 		}
 		
 		//Now to plot the normalized data
 		//When you plot these data points they are all backwards, you need to FLIP everything
 		//start plotting X from the right, because most recent data is at the front of the JSON DB data (starting from 0) 
-		//Y-axis (after the flip) needs a modifier to get above the footer area (tried - 5, but sometimes it doesn't work, something is wrong...)
+		//Y-axis (after the flip) needs a modifier to get above the footer area, this turned out to be floating, so you need to use the normalized Bitcoin Minimum... this took me ages to figure out
 		var normYAxis = 4 - normBtcMin;
 		var plot = 0;
 		while (plot < xAxisLength) {
