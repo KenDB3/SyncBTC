@@ -1,0 +1,180 @@
+SyncBTC by KenDB3
+bbs.kd3.us
+
+  I) About SyncBTC
+ II) External Program Configuration
+     A) Files
+	 B) modopts.ini
+	    1) Chart Currency
+	    2) Binary Animation (BitBomb)
+     C) External Door Config for bitcoin.js
+III) References and Links
+
+--------------------
+
+I) About SyncBTC
+
+A Bitcoin Exchange Rate external program (door) written in javascript for 
+Synchronet BBS and ANSI capable terminals.
+
+SyncBTC is a javascript application that gathers the current Bitcoin exchange 
+rate as well as historic rates using the API from coinbase.com. It is 
+designed to run on a Synchronet Bulletin Board System (BBS), and must be 
+viewed with an ANSI capable terminal. This program was inspired by 
+BCR Coins from BitSunrise.com (aka: Black Country Rock/Bit Sunrise).  
+You can actually see the conversation that started this project here:
+https://www.reddit.com/r/bbs/comments/4owbrt/bcr_coins_an_ansi_bitcoin_price_chart_generator/
+
+The default currency is US Dollars (USD) for the first displayed exchange
+rate as well as the chart of historic exchange rates. However, Sysops can 
+choose what currency to base the first listed exchange rate and chart off. 
+This customization is done for SBBS through modopts.ini (see setup below). 
+
+Data coming from Coinbase.com does not require an API Key, thanks to the fact 
+that only some simple queries are used. This makes it quicker and easier for 
+Sysops to set up.
+
+This door REQUIRES AN ANSI CAPABLE TERMINAL TO VIEW. It would be an utter 
+mess without it due to many many cursor placements in the code. However, 
+when you set up the External Door Config in SCFG, you can use line 7 to 
+create an Access Requirement of ANSI which will restrict the door to users
+with an ANSI terminal.
+
+Other requirements for your callers include:
+	Minimum Terminal Rows = 12
+	Minimum Terminal Columns = 80
+
+But, there is no Maximum size for Rows or Columns. In fact, I encourage you 
+to try a bigger terminal. The biggest I tried was 470x165 (470 columns wide 
+by 165 rows high) using PuTTY. The data on the chart should adapt 
+accordingly. There is a binary animation that I call BitBomb. It happens 
+before the Exchange Rate data is displayed. While the BitBomb looks cool, 
+you can turn it off if you don't want it to display. I did have to put 
+some code to limit it, though. When I tried out the excessively large 
+terminal screen size of 470x165 it looked pretty great but took what seemed 
+like an eternity to render. So, the animation is limited to 136x30. This 
+seemed reasonable. 
+
+--------------------
+
+II) External Program Configuration
+
+A) If you downloaded this as a ZIP file, extract the files to a folder in your
+   /sbbs/xtrn/ directory. This doc assumes you named the folder "SyncBTC" 
+   (ie. /sbbs/xtrn/SyncBTC/). 
+
+B) Add the following section to your ctrl/modopts.ini file (typically located 
+   at /sbbs/ctrl/modopts.ini):
+
+[SyncBTC]
+chartCurrency = USD
+binaryAnimation = YES
+
+1) Chart Currency
+Change the entry for "chartCurrency = USD" to any currency found in the 
+Coinbase.com API. You can look at the JSON response from this URL for options:
+    https://api.coinbase.com/v2/currencies
+	or this URL which is one of the actual queries SyncBTC uses...
+	https://api.coinbase.com/v2/exchange-rates?currency=BTC
+	You may have to tell your browser it can open the JSON file, or just 
+	download 	the file and open it with a Text Editor like Notepad++, 
+	Notepad2, Windows Notepad, etc....
+	You can cross reference what you find there with this list:
+	https://en.wikipedia.org/wiki/ISO_4217
+	But occasionally Coinbase.com will create codes where none exist, for
+	example: BTC represents Bitcoin, and that isn't an official ISO_4217 code.
+
+	Some Examples of Common Currencies:
+	USD - for United States Dollars
+	CAD - for Canadian Dollars
+	EUR - for Eurozone Euros
+	GBP - for British Pound
+	AUD - for Australian Dollar
+	NZD - for New Zealand Dollar
+	JPY - for Japanese Yen
+	CNY - for Chinese Yuan
+	CHF - for Swiss Franc
+	MXN - for Mexican Peso
+	ARS - for Argentina Peso
+
+Example of British Pound for your currency would be:
+chartCurrency = GBP
+
+NOTE: No quotes are needed in the modopts.ini section you added. 
+
+2) Binary Animation (BitBomb)
+Change the entry for "binaryAnimation = YES" to be a "NO" if you do not want 
+the animation of 1s and 0s before the data is displayed. I added it just as 
+something cool to watch before you get the data displayed. The animation is
+actually happening before the lookup and processing of the data, so, in effect
+it is actually slowing down the application. But, again, I thought it looked
+pretty good and made the app more interesting. Again, to turn it off you need
+to enter "NO" specifically. An "N" will not suffice. Example of it off:
+binaryAnimation = NO
+   
+C) Set up the External Door via Synchornet Configuration, External Programs
+
+[bitcoin.js]
+ 1: Name                       Bitcoin Exchange Rate
+ 2: Internal Code              SYNCBTC
+ 3: Start-up Directory         ../xtrn/SyncBTC/
+ 4: Command Line               ?bitcoin.js
+ 5: Clean-up Command Line      
+ 6: Execution Cost             None
+ 7: Access Requirements        ANSI
+ 8: Execution Requirements     
+ 9: Multiple Concurrent Users  Yes
+10: Intercept Standard I/O     No
+11: Native (32-bit) Executable No
+12: Use Shell to Execute       No
+13: Modify User Data           No
+14: Execute on Event           No
+15: Pause After Execution      No
+16: BBS Drop File Type         None
+17: Place Drop File In         Node Directory
+18: Time Options...
+
+NOTE: This door is *HEAVILY RELIANT* on the user's terminal supporting ANSI. 
+However, if you want it to also be used as a Logon Event, make sure that you 
+are setting #7, Access Requirements, to be "ANSI" as instructed above. Then 
+you can change #14, "Execute on Event", accordingly. 
+Example:
+14: Execute on Event           Logon
+Which makes it a door you can run from Externals as well as a Logon Event
+or...
+14: Execute on Event           Logon, Only
+Which makes it Only a Logon Event
+
+--------------------
+
+III) References and Links
+
+Download Location:
+http://bbs.kd3.us/kd3doors.ssjs
+
+Project Page:
+https://github.com/KenDB3/SyncBTC
+
+Ideation: 
+https://www.reddit.com/r/bbs/comments/4owbrt/bcr_coins_an_ansi_bitcoin_price_chart_generator/
+
+ -See the original BCR Coins in action here: (It is a Logon Event)
+  telnet://bitsunrise.com/
+  http://bitsunrise.com/
+
+Data:
+https://developers.coinbase.com/api/v2
+
+ -API Calls:
+  Current Exchange Rates:
+  https://api.coinbase.com/v2/exchange-rates?currency=BTC
+  Example for Historic Prices for a given currency:
+  https://api.coinbase.com/v2/prices/historic?currency=USD&days=76
+ 
+ -API Query to get Listed Currencies & Symbols:
+  https://api.coinbase.com/v2/currencies
+
+Helpful Currency Symbol Resources:
+http://www.xe.com/symbols.php
+and
+https://en.wikipedia.org/wiki/ISO_4217
