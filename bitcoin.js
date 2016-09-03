@@ -209,31 +209,31 @@ function bitcoinprice() {
 		while (plot < xAxisLength) {
 			var flip = totalHeight - btcArray[plot];
 			console.gotoxy((appLength - plot),(flip - normYAxis));
-			if (((normBtcMax - btcArray[plot]) / appHeight) <= ((1/14) * 1)) {
+			if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/14) * 1)) {
 				write(darkblue);
-			} else if (((normBtcMax - btcArray[plot]) / appHeight) <= ((1/12) * 1)) {
+			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 1)) {
 				write(darkblue);
-			} else if (((normBtcMax - btcArray[plot]) / appHeight) <= ((1/12) * 2)) {
+			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 2)) {
 				write(blue);
-			} else if (((normBtcMax - btcArray[plot]) / appHeight) <= ((1/12) * 3)) {
+			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 3)) {
 				write(darkcyan);
-			} else if (((normBtcMax - btcArray[plot]) / appHeight) <= ((1/12) * 4)) {
+			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 4)) {
 				write(cyan);
-			} else if (((normBtcMax - btcArray[plot]) / appHeight) <= ((1/12) * 5)) {
+			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 5)) {
 				write(darkgreen);
-			} else if (((normBtcMax - btcArray[plot]) / appHeight) <= ((1/12) * 6)) {
+			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 6)) {
 				write(green);
-			} else if (((normBtcMax - btcArray[plot]) / appHeight) <= ((1/12) * 7)) {
+			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 7)) {
 				write(yellow);
-			} else if (((normBtcMax - btcArray[plot]) / appHeight) <= ((1/12) * 8)) {
+			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 8)) {
 				write(darkyellow);
-			} else if (((normBtcMax - btcArray[plot]) / appHeight) <= ((1/12) * 9)) {
+			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 9)) {
 				write(red);
-			} else if (((normBtcMax - btcArray[plot]) / appHeight) <= ((1/12) * 10)) {
+			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 10)) {
 				write(darkred);
-			} else if (((normBtcMax - btcArray[plot]) / appHeight) <= ((1/12) * 11)) {
+			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 11)) {
 				write(magenta);
-			} else if (((normBtcMax - btcArray[plot]) / appHeight) <= ((1/12) * 12)) {
+			} else if (((appHeight - (btcArray[plot] - normBtcMin)) / appHeight) <= ((1/12) * 12)) {
 				write(darkmagenta);
 			} else {
 				write(darkmagenta);
