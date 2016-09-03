@@ -3,6 +3,8 @@
 load("http.js"); //this loads the http libraries which you will need to make requests to the web server
 load("sbbsdefs.js"); //loads a bunch-o-stuff that is probably beyond the understanding of mere mortals 
 load(js.exec_dir + "ctrl-a_colors.js"); //predefined a whole bunch of Ctrl-A (Sync) Color Codes
+load("event-timer.js");
+
 var opts=load({},"modopts.js","SyncBTC"); 
 
 if (typeof opts.chartCurrency === 'undefined') {
@@ -34,15 +36,33 @@ if (chartCurrency == "USD" || chartCurrency == "XCD" || chartCurrency == "AUD" |
 } else {
 	var currSymbol = "";
 }
+
+var totalHeight = console.screen_rows;
+var appHeight = (console.screen_rows - 6); //minus 3 top, minus 3 bottom
+var yAxisHeight = (appHeight - 2); //minus 2 more for max/min data points
+var totalLength = console.screen_columns;
+var appLength = (console.screen_columns - 1);
+var xAxisLength = (console.screen_columns - 4); //minus 3 for numbers on left, minus 1 for border on right 
+
+var timer=new Timer();
+
+function bitbomb() {
+	for (j = 1; j < (totalHeight - 2); j++) {
+		for (i = 0; i < totalLength; i++) {
+			console.gotoxy((totalLength - i),(totalHeight - j));
+			if (Math.random() > 0.50) {
+				console.putmsg(blue + "1");
+			} else {
+				console.putmsg(darkblue + "0");
+			}
+		}
+	}
+}
+
+var event1 = timer.addEvent(600,4,bitbomb);
+
 	
 function bitcoinprice() {
-		var totalHeight = console.screen_rows;
-		var appHeight = (console.screen_rows - 6); //minus 3 top, minus 3 bottom
-		var yAxisHeight = (appHeight - 2); //minus 2 more for max/min data points
-		var totalLength = console.screen_columns;
-		var appLength = (console.screen_columns - 1);
-		var xAxisLength = (console.screen_columns - 4); //minus 3 for numbers on left, minus 1 for border on right 
-		
 		if (totalHeight < 11) {
 			console.clear();
 			write(magenta + "\r\nYour terminal height is too few rows for this app to run. \r\nReturning you to the BBS...");
@@ -69,17 +89,10 @@ function bitcoinprice() {
         var reqExchangeRate = new HTTPRequest();
 		var reqHistoricPriceDays = new HTTPRequest();
 		
-		for (k = 0; k < 4; k++) {
-			for (j = 0; j < (totalHeight - 2); j++) {
-				for (i = 0; i < totalLength; i++) {
-					console.gotoxy((totalLength - i),(totalHeight - j));
-					if (Math.random() > 0.50) {
-						console.putmsg(blue + "1");
-					} else {
-						console.putmsg(darkblue + "0");
-					}
-				}
-			}
+		while(timer.events.length > 0) {
+			timer.cycle();
+			mswait(100);
+			//event1.abort = true;
 		}
 		
 		var bitgraphx = 0;
@@ -310,65 +323,300 @@ function bitcoinprice() {
 			console.putmsg(darkcyan + "\044" + rateUSD + " USD/BTC");
 			localizeCurrency = 1;
 		} else if (chartCurrency == 'CAD') {
-			console.putmsg(darkcyan + " - \044" + rateCAD + " CAD/BTC");
+			console.putmsg(darkcyan + "\044" + rateCAD + " CAD/BTC");
 			localizeCurrency = 2;
 		} else if (chartCurrency == 'EUR') {
-			console.putmsg(darkcyan + " - \356" + rateEUR + " EUR/BTC");
+			console.putmsg(darkcyan + "\356" + rateEUR + " EUR/BTC");
 			localizeCurrency = 3;
 		} else if (chartCurrency == 'GBP') {
-			console.putmsg(darkcyan + " - \234" + rateGBP + " GBP/BTC");
+			console.putmsg(darkcyan + "\234" + rateGBP + " GBP/BTC");
 			localizeCurrency = 4;
 		} else if (chartCurrency == 'JPY') {
-			console.putmsg(darkcyan + " - \235" + rateJPY + " JPY/BTC");
+			console.putmsg(darkcyan + "\235" + rateJPY + " JPY/BTC");
 			localizeCurrency = 5;
 		} else if (chartCurrency == 'CNY') {
-			console.putmsg(darkcyan + " - \235" + rateCNY + " CNY/BTC");
+			console.putmsg(darkcyan + "\235" + rateCNY + " CNY/BTC");
 			localizeCurrency = 6;
 		} else if (chartCurrency == 'AUD') {
-			console.putmsg(darkcyan + " - \044" + rateAUD + " AUD/BTC");
+			console.putmsg(darkcyan + "\044" + rateAUD + " AUD/BTC");
 			localizeCurrency = 7;
 		} else if (chartCurrency == 'NZD') {
-			console.putmsg(darkcyan + " - \044" + rateNZD + " NZD/BTC");
+			console.putmsg(darkcyan + "\044" + rateNZD + " NZD/BTC");
 			localizeCurrency = 8;
 		} else if (chartCurrency == 'CHF') {
-			console.putmsg(darkcyan + " - CHF" + rateCHF + " CHF/BTC");
+			console.putmsg(darkcyan + rateCHF + " CHF/BTC");
 			localizeCurrency = 9;
 		} else {
-			console.putmsg(darkcyan + " - " + currSymbol + rateLocal + " " + chartCurrency + "/BTC");
+			console.putmsg(darkcyan + currSymbol + rateLocal + " " + chartCurrency + "/BTC");
 			localizeCurrency = 10;
 		}
 		
-
-// add switch here			
-			
-			
-			
+		switch(localizeCurrency) {
+			case 1: //local is USD
+				if (appLength > (46 + rateUSD.length + rateCAD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateCAD + " CAD/BTC");
+				}
+				if (appLength > (58 + rateUSD.length + rateCAD.length + rateEUR.length)) {
+					console.putmsg(darkcyan + " - \356" + rateEUR + " EUR/BTC");
+				}
+				if (appLength > (70 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length)) {
+					console.putmsg(darkcyan + " - \234" + rateGBP + " GBP/BTC");
+				}
+				if (appLength > (82 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length)) {
+					console.putmsg(darkcyan + " - \235" + rateJPY + " JPY/BTC");
+				}
+				if (appLength > (94 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length)) {
+					console.putmsg(darkcyan + " - \235" + rateCNY + " CNY/BTC");
+				}
+				if (appLength > (106 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateAUD + " AUD/BTC");
+				}
+				if (appLength > (118 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateNZD + " NZD/BTC");
+				}
+				if (appLength > (132 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length + rateCHF.length )) {
+					console.putmsg(darkcyan + " - CHF" + rateCHF + " CHF/BTC");
+				}
+				break;
+			case 2: //local is CAD
+				if (appLength > (46 + rateCAD.length + rateUSD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateUSD + " USD/BTC");
+				}
+				if (appLength > (58 + rateUSD.length + rateCAD.length + rateEUR.length)) {
+					console.putmsg(darkcyan + " - \356" + rateEUR + " EUR/BTC");
+				}
+				if (appLength > (70 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length)) {
+					console.putmsg(darkcyan + " - \234" + rateGBP + " GBP/BTC");
+				}
+				if (appLength > (82 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length)) {
+					console.putmsg(darkcyan + " - \235" + rateJPY + " JPY/BTC");
+				}
+				if (appLength > (94 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length)) {
+					console.putmsg(darkcyan + " - \235" + rateCNY + " CNY/BTC");
+				}
+				if (appLength > (106 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateAUD + " AUD/BTC");
+				}
+				if (appLength > (118 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateNZD + " NZD/BTC");
+				}
+				if (appLength > (132 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length + rateCHF.length )) {
+					console.putmsg(darkcyan + " - CHF" + rateCHF + " CHF/BTC");
+				}
+				break;
+			case 3: //local is EUR
+				if (appLength > (46 + rateEUR.length + rateUSD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateUSD + " USD/BTC");
+				}
+				if (appLength > (58 + rateEUR.length + rateUSD.length + rateCAD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateCAD + " CAD/BTC");
+				}
+				if (appLength > (70 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length)) {
+					console.putmsg(darkcyan + " - \234" + rateGBP + " GBP/BTC");
+				}
+				if (appLength > (82 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length)) {
+					console.putmsg(darkcyan + " - \235" + rateJPY + " JPY/BTC");
+				}
+				if (appLength > (94 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length)) {
+					console.putmsg(darkcyan + " - \235" + rateCNY + " CNY/BTC");
+				}
+				if (appLength > (106 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateAUD + " AUD/BTC");
+				}
+				if (appLength > (118 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateNZD + " NZD/BTC");
+				}
+				if (appLength > (132 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length + rateCHF.length )) {
+					console.putmsg(darkcyan + " - CHF" + rateCHF + " CHF/BTC");
+				}
+				break;
+			case 4: //local is GBP
+				if (appLength > (46 + rateGBP.length + rateUSD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateUSD + " USD/BTC");
+				}
+				if (appLength > (58 + rateGBP.length + rateUSD.length + rateEUR.length)) {
+					console.putmsg(darkcyan + " - \356" + rateEUR + " EUR/BTC");
+				}
+				if (appLength > (70 + rateGBP.length + rateUSD.length + rateEUR.length + rateCAD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateCAD + " CAD/BTC");
+				}
+				if (appLength > (82 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length)) {
+					console.putmsg(darkcyan + " - \235" + rateJPY + " JPY/BTC");
+				}
+				if (appLength > (94 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length)) {
+					console.putmsg(darkcyan + " - \235" + rateCNY + " CNY/BTC");
+				}
+				if (appLength > (106 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateAUD + " AUD/BTC");
+				}
+				if (appLength > (118 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateNZD + " NZD/BTC");
+				}
+				if (appLength > (132 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length + rateCHF.length )) {
+					console.putmsg(darkcyan + " - CHF" + rateCHF + " CHF/BTC");
+				}
+				break;
+			case 5: //local is JPY
+				if (appLength > (46 + rateJPY.length + rateUSD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateUSD + " USD/BTC");
+				}
+				if (appLength > (58 + rateUSD.length + rateJPY.length + rateEUR.length)) {
+					console.putmsg(darkcyan + " - \356" + rateEUR + " EUR/BTC");
+				}
+				if (appLength > (70 + rateUSD.length + rateJPY.length + rateEUR.length + rateGBP.length)) {
+					console.putmsg(darkcyan + " - \234" + rateGBP + " GBP/BTC");
+				}
+				if (appLength > (82 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length)) {
+					console.putmsg(darkcyan + " - \044" + rateCAD + " CAD/BTC");
+				}
+				if (appLength > (94 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length)) {
+					console.putmsg(darkcyan + " - \235" + rateCNY + " CNY/BTC");
+				}
+				if (appLength > (106 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateAUD + " AUD/BTC");
+				}
+				if (appLength > (118 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateNZD + " NZD/BTC");
+				}
+				if (appLength > (132 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length + rateCHF.length )) {
+					console.putmsg(darkcyan + " - CHF" + rateCHF + " CHF/BTC");
+				}
+				break;
+			case 6: //local is CNY
+				if (appLength > (46 + rateCNY.length + rateUSD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateUSD + " USD/BTC");
+				}
+				if (appLength > (58 + rateUSD.length + rateCNY.length + rateEUR.length)) {
+					console.putmsg(darkcyan + " - \356" + rateEUR + " EUR/BTC");
+				}
+				if (appLength > (70 + rateUSD.length + rateCNY.length + rateEUR.length + rateGBP.length)) {
+					console.putmsg(darkcyan + " - \234" + rateGBP + " GBP/BTC");
+				}
+				if (appLength > (82 + rateUSD.length + rateCNY.length + rateEUR.length + rateGBP.length + rateJPY.length)) {
+					console.putmsg(darkcyan + " - \235" + rateJPY + " JPY/BTC");
+				}
+				if (appLength > (94 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length)) {
+					console.putmsg(darkcyan + " - \044" + rateCAD + " CAD/BTC");
+				}
+				if (appLength > (106 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateAUD + " AUD/BTC");
+				}
+				if (appLength > (118 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateNZD + " NZD/BTC");
+				}
+				if (appLength > (132 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length + rateCHF.length )) {
+					console.putmsg(darkcyan + " - CHF" + rateCHF + " CHF/BTC");
+				}
+				break;
+			case 7: //local is AUD
+				if (appLength > (46 + rateAUD.length + rateUSD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateUSD + " USD/BTC");
+				}
+				if (appLength > (58 + rateUSD.length + rateAUD.length + rateEUR.length)) {
+					console.putmsg(darkcyan + " - \356" + rateEUR + " EUR/BTC");
+				}
+				if (appLength > (70 + rateUSD.length + rateAUD.length + rateEUR.length + rateGBP.length)) {
+					console.putmsg(darkcyan + " - \234" + rateGBP + " GBP/BTC");
+				}
+				if (appLength > (82 + rateUSD.length + rateAUD.length + rateEUR.length + rateGBP.length + rateJPY.length)) {
+					console.putmsg(darkcyan + " - \235" + rateJPY + " JPY/BTC");
+				}
+				if (appLength > (94 + rateUSD.length + rateAUD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length)) {
+					console.putmsg(darkcyan + " - \235" + rateCNY + " CNY/BTC");
+				}
+				if (appLength > (106 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateCAD + " CAD/BTC");
+				}
+				if (appLength > (118 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateNZD + " NZD/BTC");
+				}
+				if (appLength > (132 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length + rateCHF.length )) {
+					console.putmsg(darkcyan + " - CHF" + rateCHF + " CHF/BTC");
+				}
+				break;
+			case 8: //local is NZD
+				if (appLength > (46 + rateNZD.length + rateUSD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateUSD + " USD/BTC");
+				}
+				if (appLength > (58 + rateUSD.length + rateNZD.length + rateEUR.length)) {
+					console.putmsg(darkcyan + " - \356" + rateEUR + " EUR/BTC");
+				}
+				if (appLength > (70 + rateUSD.length + rateNZD.length + rateEUR.length + rateGBP.length)) {
+					console.putmsg(darkcyan + " - \234" + rateGBP + " GBP/BTC");
+				}
+				if (appLength > (82 + rateUSD.length + rateNZD.length + rateEUR.length + rateGBP.length + rateJPY.length)) {
+					console.putmsg(darkcyan + " - \235" + rateJPY + " JPY/BTC");
+				}
+				if (appLength > (94 + rateUSD.length + rateNZD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length)) {
+					console.putmsg(darkcyan + " - \235" + rateCNY + " CNY/BTC");
+				}
+				if (appLength > (106 + rateUSD.length + rateNZD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateAUD + " AUD/BTC");
+				}
+				if (appLength > (118 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateCAD + " CAD/BTC");
+				}
+				if (appLength > (132 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length + rateCHF.length )) {
+					console.putmsg(darkcyan + " - CHF" + rateCHF + " CHF/BTC");
+				}
+				break;
+			case 9: //local is CHF
+				if (appLength > (46 + rateCHF.length + rateUSD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateUSD + " USD/BTC");
+				}
+				if (appLength > (58 + rateUSD.length + rateCHF.length + rateEUR.length)) {
+					console.putmsg(darkcyan + " - \356" + rateEUR + " EUR/BTC");
+				}
+				if (appLength > (70 + rateUSD.length + rateCHF.length + rateEUR.length + rateGBP.length)) {
+					console.putmsg(darkcyan + " - \234" + rateGBP + " GBP/BTC");
+				}
+				if (appLength > (82 + rateUSD.length + rateCHF.length + rateEUR.length + rateGBP.length + rateJPY.length)) {
+					console.putmsg(darkcyan + " - \235" + rateJPY + " JPY/BTC");
+				}
+				if (appLength > (94 + rateUSD.length + rateCHF.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length)) {
+					console.putmsg(darkcyan + " - \235" + rateCNY + " CNY/BTC");
+				}
+				if (appLength > (106 + rateUSD.length + rateCHF.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateAUD + " AUD/BTC");
+				}
+				if (appLength > (118 + rateUSD.length + rateCHF.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateNZD + " NZD/BTC");
+				}
+				if (appLength > (130 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length + rateCHF.length )) {
+					console.putmsg(darkcyan + " - \044" + rateCAD + " CAD/BTC");
+				}
+				break;
+			default:
+				if (appLength > (46 + rateLocal.length + rateUSD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateUSD + " USD/BTC");
+				}
+				if (appLength > (58 + rateUSD.length + rateLocal.length + rateEUR.length)) {
+					console.putmsg(darkcyan + " - \356" + rateEUR + " EUR/BTC");
+				}
+				if (appLength > (70 + rateUSD.length + rateLocal.length + rateEUR.length + rateGBP.length)) {
+					console.putmsg(darkcyan + " - \234" + rateGBP + " GBP/BTC");
+				}
+				if (appLength > (82 + rateUSD.length + rateLocal.length + rateEUR.length + rateGBP.length + rateJPY.length)) {
+					console.putmsg(darkcyan + " - \235" + rateJPY + " JPY/BTC");
+				}
+				if (appLength > (94 + rateUSD.length + rateLocal.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length)) {
+					console.putmsg(darkcyan + " - \235" + rateCNY + " CNY/BTC");
+				}
+				if (appLength > (106 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateAUD + " AUD/BTC");
+				}
+				if (appLength > (118 + rateUSD.length + rateLocal.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateNZD + " NZD/BTC");
+				}
+				if (appLength > (132 + rateUSD.length + rateLocal.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length + rateCHF.length )) {
+					console.putmsg(darkcyan + " - CHF" + rateCHF + " CHF/BTC");
+				}
+				if (appLength > (144 + rateUSD.length + rateLocal.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length + rateCHF.length + rateCAD.length)) {
+					console.putmsg(darkcyan + " - \044" + rateCAD + " CAD/BTC");
+				}
+		} 
 		
-		if (appLength > (46 + rateUSD.length + rateCAD.length + rateEUR.length)) {
-			console.putmsg(darkcyan + " - \044" + rateCAD + " CAD/BTC");
-		}
-		if (appLength > (58 + rateUSD.length + rateCAD.length + rateEUR.length)) {
-			console.putmsg(darkcyan + " - \356" + rateEUR + " EUR/BTC");
-		}
-		if (appLength > (70 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length)) {
-			console.putmsg(darkcyan + " - \234" + rateGBP + " GBP/BTC");
-		}
-		if (appLength > (82 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length)) {
-			console.putmsg(darkcyan + " - \235" + rateJPY + " JPY/BTC");
-		}
-		if (appLength > (94 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length)) {
-			console.putmsg(darkcyan + " - \235" + rateCNY + " CNY/BTC");
-		}
-		if (appLength > (106 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length)) {
-			console.putmsg(darkcyan + " - \044" + rateAUD + " AUD/BTC");
-		}
-		if (appLength > (118 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length)) {
-			console.putmsg(darkcyan + " - \044" + rateNZD + " NZD/BTC");
-		}
-		if (appLength > (132 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length + rateCHF.length )) {
-			console.putmsg(darkcyan + " - CHF" + rateCHF + " CHF/BTC");
-		}
-		
+				
 		//Now to plot the normalized data
 		//When you plot these data points they are all backwards, you need to FLIP everything
 		//start plotting X from the right, because most recent data is at the front of the JSON DB data (starting from 0) 
