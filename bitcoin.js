@@ -27,7 +27,7 @@ function bitcoinprice() {
 		console.clear();
 		write(magenta + "\r\nPolling Live and Historical Bitcoin Prices... Please be patient.");
 		var btcHeader = blue + "\r\n  Current Exchange Rate: \r\n" + 
-			darkblue + " \325\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315 Bitcoin Price Chart (USD) \315\315";
+			darkblue + " \325\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315 " + blue + "Bitcoin Price Chart (USD)" + darkblue + " \315\315";
 		var btcFooter = darkmagenta + " \324\315oldest\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\r\n" 
 			+ darkmagenta + "  syncBTC:" + blue + "KenDB3  " + darkmagenta + "Data:" + blue + "Coinbase.com  " + darkmagenta + "Original Concept:" + blue + "BCR / BitSunrise.com " + darkmagenta + "\315\315\315\r\n";
 		var btcFooterEnd1 = "\270";
@@ -69,9 +69,12 @@ function bitcoinprice() {
 		}
 		*/
 		var rateUSD = jsonExchangeRate.data.rates.USD;
+		var rateCAD = jsonExchangeRate.data.rates.CAD;
 		var rateGBP = jsonExchangeRate.data.rates.GBP;
 		var rateEUR = jsonExchangeRate.data.rates.EUR;
-		var l = jsonHistoricPriceDays.data.prices.length;
+		var rateJPY = jsonExchangeRate.data.rates.JPY;
+		var rateCNY = jsonExchangeRate.data.rates.CNY;
+		var l = jsonHistoricPriceDays.data.prices.length; //That's a lowercase letter "L", as in length
 		
 		//This got messy and difficult, so creating an intermediate array to hold the data made things easier
 		var Intermezzo = [];
@@ -87,6 +90,9 @@ function bitcoinprice() {
 		var btcArray = [];
 		var btcMax = Math.max.apply(null, Intermezzo);
 		var btcMaxWhole = Math.round(btcMax);
+		if (btcMaxWhole.length > 3) {
+			xAxisLength = (xAxisLength - (btcMaxWhole.length - 3));
+		}
 		var btcMin = Math.min.apply(null, Intermezzo);
 		var btcMinWhole = Math.round(btcMin);
 		var ratio = ((btcMaxWhole - btcMinWhole) / (appHeight - 1));
@@ -117,7 +123,7 @@ function bitcoinprice() {
 		}
 		console.gotoxy(1,4);
 		//Write the Max value of the y-axis
-		console.putmsg(darkblue + btcMaxWhole);
+		console.putmsg(blue + btcMaxWhole);
 		//Draw a color coded y-axis
 		var k = 0;
 		var colorArray = [];
@@ -167,7 +173,7 @@ function bitcoinprice() {
 		colorArray.push(darkmagenta);
 		console.gotoxy(1,(totalHeight - 3));
 		//Write the Min value of the y-axis
-		console.putmsg(darkmagenta + btcMinWhole);
+		console.putmsg(magenta + btcMinWhole);
 		console.gotoxy(1,(totalHeight - 2));
 		//Write the footer, which is at least 79 characters long
 		console.putmsg(btcFooter);
@@ -213,7 +219,16 @@ function bitcoinprice() {
 		console.crlf();
 		console.gotoxy(26,1);
 		//Draw current Exchange Rate at the top in USD, EUR, and GBP
-		console.putmsg(darkcyan + "\044" + rateUSD + " USD/BTC" + " - \356" + rateEUR + " EUR/BTC" + " - \234" + rateGBP + " GPB/BTC");
+		console.putmsg(darkcyan + "\044" + rateUSD + " USD/BTC" + " - \044" + rateCAD + " CAD/BTC" + " - \356" + rateEUR + " EUR/BTC");
+		if (appLength > 98) {
+			console.putmsg(darkcyan + " - \234" + rateGBP + " GBP/BTC");
+		}
+		if (appLength > 118) {
+			console.putmsg(darkcyan + " - \235" + rateJPY + " JPY/BTC");
+		}
+		if (appLength > 133) {
+			console.putmsg(darkcyan + " - \235" + rateCNY + " CNY/BTC");
+		}
 		
 		//Now to plot the normalized data
 		//When you plot these data points they are all backwards, you need to FLIP everything
