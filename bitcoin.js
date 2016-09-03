@@ -58,7 +58,7 @@ function bitcoinprice() {
 		}
 		
 		console.clear();
-		write(magenta + "\r\nPolling Live and Historical Bitcoin Prices... Please be patient.");
+		write(magenta + "\r\nPolling Bitcoin Price Data... Please be patient. Currency is: " + chartCurrency);
 		var btcHeader = blue + "\r\n  Current Exchange Rate: \r\n" + 
 			darkblue + " \325\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315 " + blue + "Bitcoin Price Chart (" + chartCurrency + ")" + darkblue + " \315\315";
 		var btcFooter = darkmagenta + " \324\315oldest\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\315\r\n" 
@@ -68,6 +68,56 @@ function bitcoinprice() {
 		var btcxAxis = " \263";
         var reqExchangeRate = new HTTPRequest();
 		var reqHistoricPriceDays = new HTTPRequest();
+		
+		for (k = 0; k < 4; k++) {
+			for (j = 0; j < (totalHeight - 2); j++) {
+				for (i = 0; i < totalLength; i++) {
+					console.gotoxy((totalLength - i),(totalHeight - j));
+					if (Math.random() > 0.50) {
+						console.putmsg(blue + "1");
+					} else {
+						console.putmsg(darkblue + "0");
+					}
+				}
+			}
+		}
+		
+		var bitgraphx = 0;
+		
+		while ((bitgraphx + 9) < totalLength) {
+			console.gotoxy(4 + bitgraphx,3);
+			console.putmsg(darkcyan + "B");
+			console.gotoxy(6 + bitgraphx,3);
+			console.putmsg(darkcyan + "B");
+			console.gotoxy(2 + bitgraphx,4);
+			console.putmsg(darkcyan + "BBBBBBB");
+			console.gotoxy(2 + bitgraphx,5);
+			console.putmsg(darkcyan + "BB");
+			console.gotoxy(8 + bitgraphx,5);
+			console.putmsg(darkcyan + "BB");
+			console.gotoxy(2 + bitgraphx,6);
+			console.putmsg(darkcyan + "BB");
+			console.gotoxy(8 + bitgraphx,6);
+			console.putmsg(darkcyan + "BB");
+			console.gotoxy(2 + bitgraphx,7);
+			console.putmsg(darkcyan + "BBBBBBB");
+			console.gotoxy(2 + bitgraphx,8);
+			console.putmsg(darkcyan + "BB");
+			console.gotoxy(8 + bitgraphx,8);
+			console.putmsg(darkcyan + "BB");
+			console.gotoxy(2 + bitgraphx,9);
+			console.putmsg(darkcyan + "BB");
+			console.gotoxy(8 + bitgraphx,9);
+			console.putmsg(darkcyan + "BB");
+			console.gotoxy(2 + bitgraphx,10);
+			console.putmsg(darkcyan + "BBBBBBB");
+			console.gotoxy(4 + bitgraphx,11);
+			console.putmsg(darkcyan + "B");
+			console.gotoxy(6 + bitgraphx,11);
+			console.putmsg(darkcyan + "B");
+			bitgraphx = bitgraphx + 9;
+		}
+		
 
 		var exchangeRate = reqExchangeRate.Get("https://api.coinbase.com/v2/exchange-rates?currency=BTC");
 		var historicPriceDays = reqHistoricPriceDays.Get("https://api.coinbase.com/v2/prices/historic?currency="+ chartCurrency + "&days=" + xAxisLength);
@@ -110,6 +160,7 @@ function bitcoinprice() {
 		var rateCHF = jsonExchangeRate.data.rates.CHF; //Swiss Franc
 		var rateAUD = jsonExchangeRate.data.rates.AUD; //Australian Dollar
 		var rateNZD = jsonExchangeRate.data.rates.NZD; //New Zealand Dollar
+		var rateLocal = jsonExchangeRate["data"]["rates"][chartCurrency]; //Localized Currency from modopts.ini
 		var l = jsonHistoricPriceDays.data.prices.length; //That's a lowercase letter "L", as in length
 		
 		//This got messy and difficult, so creating an intermediate array to hold the data made things easier
@@ -255,10 +306,48 @@ function bitcoinprice() {
 		console.crlf();
 		console.gotoxy(26,1);
 		//Draw current Exchange Rate at the top in USD, EUR, and GBP
-		console.putmsg(darkcyan + "\044" + rateUSD + " USD/BTC" + " - \044" + rateCAD + " CAD/BTC");
+		if (chartCurrency == 'USD') {
+			console.putmsg(darkcyan + "\044" + rateUSD + " USD/BTC");
+			localizeCurrency = 1;
+		} else if (chartCurrency == 'CAD') {
+			console.putmsg(darkcyan + " - \044" + rateCAD + " CAD/BTC");
+			localizeCurrency = 2;
+		} else if (chartCurrency == 'EUR') {
+			console.putmsg(darkcyan + " - \356" + rateEUR + " EUR/BTC");
+			localizeCurrency = 3;
+		} else if (chartCurrency == 'GBP') {
+			console.putmsg(darkcyan + " - \234" + rateGBP + " GBP/BTC");
+			localizeCurrency = 4;
+		} else if (chartCurrency == 'JPY') {
+			console.putmsg(darkcyan + " - \235" + rateJPY + " JPY/BTC");
+			localizeCurrency = 5;
+		} else if (chartCurrency == 'CNY') {
+			console.putmsg(darkcyan + " - \235" + rateCNY + " CNY/BTC");
+			localizeCurrency = 6;
+		} else if (chartCurrency == 'AUD') {
+			console.putmsg(darkcyan + " - \044" + rateAUD + " AUD/BTC");
+			localizeCurrency = 7;
+		} else if (chartCurrency == 'NZD') {
+			console.putmsg(darkcyan + " - \044" + rateNZD + " NZD/BTC");
+			localizeCurrency = 8;
+		} else if (chartCurrency == 'CHF') {
+			console.putmsg(darkcyan + " - CHF" + rateCHF + " CHF/BTC");
+			localizeCurrency = 9;
+		} else {
+			console.putmsg(darkcyan + " - " + currSymbol + rateLocal + " " + chartCurrency + "/BTC");
+			localizeCurrency = 10;
+		}
 		
+
+// add switch here			
+			
+			
+			
 		
-		if (appLength > (59 + rateUSD.length + rateCAD.length + rateEUR.length)) {
+		if (appLength > (46 + rateUSD.length + rateCAD.length + rateEUR.length)) {
+			console.putmsg(darkcyan + " - \044" + rateCAD + " CAD/BTC");
+		}
+		if (appLength > (58 + rateUSD.length + rateCAD.length + rateEUR.length)) {
 			console.putmsg(darkcyan + " - \356" + rateEUR + " EUR/BTC");
 		}
 		if (appLength > (70 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length)) {
@@ -270,14 +359,14 @@ function bitcoinprice() {
 		if (appLength > (94 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length)) {
 			console.putmsg(darkcyan + " - \235" + rateCNY + " CNY/BTC");
 		}
-		if (appLength > (108 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateCHF.length)) {
-			console.putmsg(darkcyan + " - SFr" + rateCHF + " CHF/BTC");
-		}
-		if (appLength > (120 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateCHF.length + rateAUD.length)) {
+		if (appLength > (106 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length)) {
 			console.putmsg(darkcyan + " - \044" + rateAUD + " AUD/BTC");
 		}
-		if (appLength > (132 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateCHF.length + rateAUD.length + rateNZD.length)) {
+		if (appLength > (118 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length)) {
 			console.putmsg(darkcyan + " - \044" + rateNZD + " NZD/BTC");
+		}
+		if (appLength > (132 + rateUSD.length + rateCAD.length + rateEUR.length + rateGBP.length + rateJPY.length + rateCNY.length + rateAUD.length + rateNZD.length + rateCHF.length )) {
+			console.putmsg(darkcyan + " - CHF" + rateCHF + " CHF/BTC");
 		}
 		
 		//Now to plot the normalized data
