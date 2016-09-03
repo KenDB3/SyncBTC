@@ -1,0 +1,11 @@
+----=#@~ SyncBTC 1.00 -by- KenDB3 ~@#=----
+Javascript Bitcoin Exchange Rate Door for 
+Synchronet BBS and ANSI capable terminals.
+Graph of rates adapts to terminal size.
+Data is pulled from Coinbase.com and no 
+API Key is needed. Sysop configures their
+local currency in /ctrl/modopts.ini file.
+Orig Concept: BCR Coins @ BitSunrise.com.
+ http://bbs.kd3.us -- telnet://bbs.kd3.us
+    https://github.com/KenDB3/SyncBTC/
+------------------------------------------
