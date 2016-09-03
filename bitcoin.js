@@ -24,7 +24,6 @@ The data on the chart should adapt accordingly.
 */
 
 load("http.js"); //this loads the http libraries which you will need to make requests to the web server
-load("sbbsdefs.js"); //loads a bunch-o-stuff that is probably beyond the understanding of mere mortals 
 load(js.exec_dir + "ctrl-a_colors.js"); //predefined a whole bunch of Ctrl-A (Sync) Color Codes
 var opts=load({},"modopts.js","SyncBTC"); 
 
