@@ -14,20 +14,20 @@ Request the Data:
 		var historicPriceDays = reqHistoricPriceDays.Get("https://api.coinbase.com/v2/prices/historic?currency="+ chartCurrency + "&days=" + xAxisLength);
 
 Parse the JSON response:
-    var jsonExchangeRate = JSON.parse(exchangeRate);
-    var jsonHistoricPriceDays = JSON.parse(historicPriceDays);
+		var jsonExchangeRate = JSON.parse(exchangeRate);
+		var jsonHistoricPriceDays = JSON.parse(historicPriceDays);
 
 Plotting the data points was a trick on a terminal screen. You had to normalize the data to fit your Row height. When you plot these data points they are all backwards, you need to FLIP everything (X and Y). Start plotting X from the right, because most recent data is at the front of the JSON DB data (starting from 0). Y-axis (after the flip) needs a modifier to get above the footer area, this turned out to be floating, so you need to use the normalized Bitcoin Minimum... this took me ages to figure out. The number 4 comes from getting above the X-axis line, App info line, Pause Prompt, Bottom blank line. This could get you either a positive or negative number, but that evens out when you subtract it from the variable "flip".
 		var normYAxis = 4 - normBtcMin; 
 		var plot = 0;
-    while (plot < xAxisLength) {
-      var flip = totalHeight - btcArray[plot];
-      console.gotoxy((appLength - plot),(flip - normYAxis));
-      var colorcode = (appHeight - (btcArray[plot] - normBtcMin + 1)); //steal the color from drawing the Y-axis line
-      write(colorArray[colorcode]);
-      write("\052");
-      plot++;
-    }
+		while (plot < xAxisLength) {
+		var flip = totalHeight - btcArray[plot];
+		console.gotoxy((appLength - plot),(flip - normYAxis));
+		var colorcode = (appHeight - (btcArray[plot] - normBtcMin + 1)); //steal the color from drawing the Y-axis line
+		write(colorArray[colorcode]);
+		write("\052");
+		plot++;
+		}
 
 ## Installation
 
