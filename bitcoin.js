@@ -331,7 +331,7 @@ function bitcoinprice() {
 	var historicPriceDays = reqHistoricPriceDays.Get("https://api.coinbase.com/v2/prices/historic?currency="+ chartCurrency + "&days=" + xAxisLength);
 	// Make sure we actually got a response. If not, log an error and exit.
 	if (exchangeRate === undefined || historicPriceDays === undefined) {
-		log("ERROR in coinbase.js: Request to api.coinbase.com returned 'undefined'");
+		log("ERROR in bitcoin.js: Request to api.coinbase.com returned 'undefined'");
 		console.center("There was a problem getting data from Coinbase.com.");
 		console.center("The sysop has been notified.");
 		console.pause();
