@@ -35,4 +35,3 @@ Plotting the data points was a trick on a terminal screen. You had to normalize 
 ## Installation
 
 Check out [sysop.txt](https://github.com/KenDB3/SyncBTC/blob/master/sysop.txt) for full installation instructions.
-
